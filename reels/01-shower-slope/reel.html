@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --navy:#0D2949; --navy2:#153960; --brass:#AA8A53; --brass2:#C6A672; --brass3:#E3C995;
+    --cream:#F6F1E6; --bad:#E0523F; --ok:#4FB37A;
+  }
+  @font-face{font-family:Heebo;src:url(fonts/Heebo-Black.ttf);font-weight:900}
+  @font-face{font-family:Heebo;src:url(fonts/Heebo-ExtraBold.ttf);font-weight:800}
+  @font-face{font-family:Heebo;src:url(fonts/Heebo-Bold.ttf);font-weight:700}
+  @font-face{font-family:Heebo;src:url(fonts/Heebo-Medium.ttf);font-weight:500}
+  @font-face{font-family:Rubik;src:url(fonts/Rubik-ExtraBold.ttf);font-weight:800}
+  @font-face{font-family:Rubik;src:url(fonts/Rubik-Bold.ttf);font-weight:700}
+  @font-face{font-family:Rubik;src:url(fonts/Rubik-Medium.ttf);font-weight:500}
+  :root{--head:"Rubik";--headw:800}
+  #cap .big, #end .share .s2, .step .t, #mop .tx, .pill.big{font-family:var(--head),"Liberation Sans",sans-serif !important;font-weight:var(--headw) !important}
+  .step .t, #mop .tx{font-weight:700 !important}
+  #cap.rev{display:flex;flex-direction:column} #cap.rev .small{order:2;margin:14px 0 0} #cap.rev .big{order:1}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1920px;background:#000;overflow:hidden}
+  body{font-family:"Liberation Sans",Arial,sans-serif;color:#fff}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--navy)}
+  #world{position:absolute;inset:0;transform-origin:0 0}
+  #bg{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
+  #ann{position:absolute;inset:0;overflow:visible}
+  .pill{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;
+    background:rgba(13,41,73,.92);border:3px solid var(--brass2);color:#fff;
+    font-weight:700;font-size:40px;padding:12px 30px 14px;border-radius:999px;
+    display:flex;align-items:center;gap:14px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  .pill i{width:16px;height:16px;border-radius:50%;background:var(--brass2);display:block}
+  .pill.bad{border-color:var(--bad)} .pill.bad i{background:var(--bad)}
+  .pill.big{font-size:64px;padding:14px 40px 18px}
+  #shadeTop{position:absolute;left:0;right:0;top:0;height:900px;
+    background:linear-gradient(180deg,rgba(9,28,52,.92) 0%,rgba(9,28,52,.75) 35%,rgba(9,28,52,0) 100%)}
+  #dim{position:absolute;inset:0;background:rgba(9,28,52,.0)}
+  #cap{position:absolute;right:84px;left:84px;top:210px;text-align:right}
+  #cap .bar{position:absolute;right:-34px;top:8px;width:10px;border-radius:5px;background:var(--brass2);transform-origin:top}
+  #cap .small{font-size:52px;font-weight:400;color:var(--cream);line-height:1.2;margin-bottom:10px}
+  #cap .big{font-size:96px;font-weight:700;line-height:1.08;letter-spacing:-1px;text-shadow:0 4px 24px rgba(0,0,0,.35)}
+  #cap em{font-style:normal;color:var(--brass3)}
+  #cap em.bad{color:#FF7A66}
+  .line{display:block;will-change:transform,opacity}
+  #tag{position:absolute;top:96px;right:84px;display:flex;align-items:center;gap:16px;
+    font-size:30px;font-weight:700;color:var(--brass3);letter-spacing:1px}
+  #tag span{color:rgba(255,255,255,.75);font-weight:400}
+  #tag b{display:block;width:44px;height:4px;background:var(--brass2)}
+  /* gauge */
+  #gauge{position:absolute;left:70px;right:70px;top:1040px;height:490px;border-radius:36px;
+    background:rgba(9,28,52,.88);border:2px solid rgba(198,166,114,.45);padding:60px 70px;direction:ltr}
+  #gauge .ttl{font-size:38px;color:var(--cream);text-align:right;direction:rtl;margin-bottom:130px}
+  .mk{bottom:28px !important}
+  #track{position:relative;height:56px;border-radius:28px;background:rgba(255,255,255,.12)}
+  #band{position:absolute;top:0;bottom:0;border-radius:28px;background:var(--ok)}
+  #band span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:34px;color:#06281a;direction:rtl}
+  .tick{position:absolute;top:80px;transform:translateX(-50%);font-size:32px;color:rgba(255,255,255,.7)}
+  .mk{position:absolute;bottom:72px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center}
+  .mk .v{background:var(--bad);color:#fff;font-weight:700;font-size:40px;padding:8px 18px;border-radius:14px}
+  .mk .st{width:6px;height:60px;background:var(--bad)}
+  #gauge .foot{position:absolute;left:70px;right:70px;bottom:46px;direction:rtl;text-align:right;
+    font-size:34px;color:rgba(255,255,255,.8)}
+  #gauge .foot b{color:#FF8C7A}
+  /* chain */
+  #chain{position:absolute;right:84px;left:20px;top:520px}
+  .step{display:flex;align-items:center;gap:30px;margin-bottom:44px;direction:rtl}
+  .step .n{flex:none;width:92px;height:92px;border-radius:50%;border:4px solid var(--brass2);
+    display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:var(--brass3);
+    background:rgba(9,28,52,.9)}
+  .step .t{font-size:43px;white-space:nowrap;font-weight:700;line-height:1.1}
+  .step.last .n{border-color:var(--bad);color:#fff;background:var(--bad)}
+  .step.last .t{color:#FF8C7A}
+  #rail{position:absolute;right:44px;top:46px;width:5px;background:rgba(198,166,114,.55);transform-origin:top}
+  /* end card */
+  #end{position:absolute;inset:0;background:#FBF8F2;overflow:hidden;color:var(--navy)}
+  #end .stripe{position:absolute;left:-260px;top:0;width:560px;height:1920px;background:var(--navy);transform:skewX(-14deg)}
+  #end .share{position:absolute;right:84px;left:84px;top:260px;text-align:right}
+  #end .share .s1{font-size:54px;color:var(--brass)}
+  #end .share .s2{font-size:92px;font-weight:700;line-height:1.08;margin-top:10px;color:var(--navy)}
+  #end .share .s2 em{font-style:normal;color:var(--brass)}
+  #end .brand{position:absolute;right:110px;top:640px}
+  #end .brand img{width:640px;display:block}
+  #end .contact{position:absolute;right:110px;top:1330px;text-align:right}
+  #end .contact .ph{font-size:84px;font-weight:700;direction:ltr;display:inline-block;color:var(--navy)}
+  #end .contact .web{font-size:46px;color:var(--brass);margin-top:14px;direction:ltr}
+  #std{position:absolute;right:70px;left:70px;top:560px;display:none;direction:rtl;
+    background:rgba(246,241,230,.97);color:var(--navy);border-radius:30px;padding:34px 44px;border-right:14px solid var(--brass)}
+  #std .row{display:flex;gap:22px;font-size:40px;line-height:1.3;margin-bottom:8px}
+  #std .k{flex:none;width:120px;font-weight:700;color:var(--brass)}
+  #std .v{font-weight:700}
+  #std .q{font-weight:400;font-size:38px}
+  #mop{position:absolute;right:84px;top:1180px;display:none;align-items:center;gap:26px;direction:rtl;
+    background:rgba(9,28,52,.9);border:3px solid var(--brass2);border-radius:36px;padding:18px 34px 18px 22px}
+  #mop .tx{font-size:48px;font-weight:700;line-height:1.15}
+  #mop .tx em{font-style:normal;color:var(--brass3)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="world">
+    <img id="bg" src="">
+    <svg id="ann" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+    <div id="pills"></div>
+  </div>
+  <div id="dim"></div>
+  <div id="shadeTop"></div>
+  <div id="tag"><b></b>מסרטי הנדסה <span>| בדק בית</span></div>
+  <div id="cap"><div class="bar"></div><div class="small"></div><div class="big"></div></div>
+  <div id="std"><div class="row"><div class="k">תקן:</div><div class="v">ת״י 1205 חלק 3</div></div>
+    <div class="row"><div class="k">סעיף:</div><div class="v">3.2.5.1</div></div>
+    <div class="row"><div class="k">הגדרה:</div><div class="v q">״תא מקלחת ללא אגנית – שיפוע רצפת התא לכיוון הנקז יהיה בין 1% ל-4%״</div></div></div>
+  <div id="mop"><svg width="170" height="170" viewBox="0 0 300 300">
+      <path d="M40 262 q30 -14 60 0 t60 0 t60 0 t60 0" fill="none" stroke="#6FB6FF" stroke-width="9" stroke-linecap="round" opacity=".9"/>
+      <circle cx="70" cy="240" r="8" fill="#6FB6FF"/><circle cx="235" cy="236" r="6" fill="#6FB6FF"/>
+      <g class="tool">
+        <rect x="140" y="14" width="20" height="190" rx="10" fill="#C6A672"/>
+        <rect x="58" y="196" width="184" height="30" rx="8" fill="#E3C995"/>
+        <rect x="52" y="224" width="196" height="14" rx="5" fill="#1b1b1b"/>
+      </g></svg>
+    <div class="tx">סילוק המים<br><em>רק באמצעות מגב</em></div></div>
+  <div id="gauge" style="display:none"></div>
+  <div id="chain" style="display:none"></div>
+  <div id="end" style="display:none"></div>
+</div>
+<script>
+const FPS = 30;
+{const f=new URLSearchParams(location.search).get('f');
+ const M={heebo:['Heebo',900],heebo8:['Heebo',800],rubik:['Rubik',700],rubik8:['Rubik',800]};
+ if(M[f]){document.documentElement.style.setProperty('--head',M[f][0]);document.documentElement.style.setProperty('--headw',M[f][1]);}}
+const pad = n => String(n).padStart(3,'0');
+const clamp = (x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const easeOut = x => 1-Math.pow(1-clamp(x),3);
+const easeBack = x => { x=clamp(x); const c1=1.70158,c3=c1+1; return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2); };
+const prog = (t,start,dur)=>clamp((t-start)/dur);
+
+const $ = id => document.getElementById(id);
+const bg=$('bg'), world=$('world'), ann=$('ann'), pills=$('pills'), cap=$('cap'),
+      dim=$('dim'), shade=$('shadeTop'), mop=$('mop'), std=$('std'), gauge=$('gauge'), chain=$('chain'), end=$('end'), tag=$('tag');
+
+/* ---------- helpers that draw for a given local time ---------- */
+function circle(cx,cy,r,p,color='#E3C995',w=8){
+  const L=2*Math.PI*r;
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${w}"
+    stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L*(1-easeOut(p))}"
+    transform="rotate(-90 ${cx} ${cy})" opacity="${p>0?1:0}"/>`;
+}
+function dashedEllipse(cx,cy,rx,ry,p,t,color='#FF7A66'){
+  if(p<=0) return '';
+  const s=0.85+0.15*easeBack(p);
+  return `<g transform="translate(${cx} ${cy}) scale(${s})" opacity="${easeOut(p*1.5)}">
+    <ellipse rx="${rx}" ry="${ry}" fill="rgba(224,82,63,.12)" stroke="${color}" stroke-width="7"
+      stroke-dasharray="26 18" stroke-dashoffset="${-t*60}"/></g>`;
+}
+function rect(x,y,w,h,p,color='#E3C995'){
+  const L=2*(w+h);
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="none" stroke="${color}" stroke-width="8"
+    stroke-dasharray="${L}" stroke-dashoffset="${L*(1-easeOut(p))}" opacity="${p>0?1:0}"/>`;
+}
+function arrow(x1,y1,x2,y2,p,color='#E3C995'){
+  if(p<=0) return '';
+  const e=easeOut(p), xe=x1+(x2-x1)*e, ye=y1+(y2-y1)*e, a=Math.atan2(y2-y1,x2-x1), h=34;
+  const p1=[xe-h*Math.cos(a-0.5), ye-h*Math.sin(a-0.5)], p2=[xe-h*Math.cos(a+0.5), ye-h*Math.sin(a+0.5)];
+  return `<line x1="${x1}" y1="${y1}" x2="${xe}" y2="${ye}" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="4 22"/>
+    <polyline points="${p1} ${xe},${ye} ${p2}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+function pill(x,y,text,p,cls=''){
+  if(p<=0) return '';
+  const s=easeBack(p);
+  return `<div class="pill ${cls}" style="left:${x}px;top:${y}px;opacity:${clamp(p*2)};transform:translate(-50%,-50%) scale(${s})"><i></i>${text}</div>`;
+}
+function setCaption(lt,small,big,top=210){
+  if(cap.dataset.key!==small+big){
+    cap.dataset.key=small+big;
+    cap.querySelector('.small').innerHTML = small.split('|').map(s=>`<span class="line">${s}</span>`).join('');
+    cap.querySelector('.big').innerHTML = big.split('|').map(s=>`<span class="line">${s}</span>`).join('');
+  }
+  cap.style.top=top+'px';
+  const lines=[...cap.querySelectorAll('.line')];
+  lines.forEach((el,i)=>{
+    const p=easeOut(prog(lt,0.05+i*0.12,0.4));
+    el.style.opacity=p; el.style.transform=`translateY(${(1-p)*40}px)`;
+  });
+  const bar=cap.querySelector('.bar');
+  bar.style.height=(cap.querySelector('.small').offsetHeight+cap.querySelector('.big').offsetHeight)+'px';
+  bar.style.transform=`scaleY(${easeOut(prog(lt,0,0.45))})`;
+  cap.style.display = small||big ? '':'none';
+}
+function camera(scale,ox,oy){ // zoom toward a point
+  world.style.transform=`translate(${ox}px,${oy}px) scale(${scale}) translate(${-ox}px,${-oy}px)`;
+}
+
+/* ---------- scenes ---------- */
+const S = [
+ { d:4.93, draw(lt){
+    bg.src=`seq/a/${pad(Math.min(153,1+Math.floor(lt*FPS)))}.jpg`;
+    camera(1,540,960);
+    setCaption(lt,'מקלחון בדירה חדשה','המים אינם זורמים|<em class="bad">לכיוון הניקוז</em>');
+    return {svg:'',pills:''};
+ }},
+ { d:6.5, draw(lt){
+    bg.src=`seq/b/${pad(Math.min(198,1+Math.floor(lt*FPS)))}.jpg`;
+    camera(1,540,960);
+    setCaption(lt,'בדיקת הזרמת מים','שלולית קבועה|במרכז תא המקלחת');
+    const mp=prog(lt,4.4,0.45);
+    mop.style.display = mp>0?'flex':'none';
+    mop.style.opacity=clamp(mp*2);
+    mop.style.transform=`translateY(${(1-easeBack(mp))*80}px)`;
+    const sw=Math.sin((lt-4.4)*7)*22;
+    mop.querySelector('svg .tool').setAttribute('transform',`translate(${sw} 0) rotate(${sw*0.35} 150 150)`);
+    return {svg:'',pills:''};
+ }},
+ { d:5.95, draw(lt){
+    bg.src='seq/5b28222e.jpg';
+    camera(1+0.08*easeOut(lt/6.0),520,900);
+    setCaption(lt,'מדידת שיפוע בפלס דיגיטלי, מהפינה לנקז','שיפוע שנמדד:|<em class="bad">0.2%</em>');
+    return {
+      svg: rect(282,700,156,138,prog(lt,0.4,0.5)) + circle(960,1180,120,prog(lt,1.8,0.6))
+         + dashedEllipse(420,1010,250,105,prog(lt,2.8,0.5),lt),
+      pills: pill(500,600,'0.2%',prog(lt,3.7,0.4),'bad big') + pill(890,1360,'נקז',prog(lt,2.1,0.4))
+           + pill(360,1180,'מים עומדים',prog(lt,3.1,0.4),'bad')
+    };
+ }},
+ { d:9.7, draw(lt){
+    bg.src='seq/b196112d.jpg';
+    camera(1.04,540,960);
+    dim.style.background='rgba(9,28,52,.55)';
+    setCaption(lt,'לפי דרישות התקן','<em>1% עד 4%</em>|לכיוון הנקז');
+    std.style.display='block';
+    const sp=easeOut(prog(lt,0.5,0.5)); std.style.opacity=sp; std.style.transform=`translateY(${(1-sp)*50}px)`;
+    gauge.style.display='block';
+    if(!gauge.dataset.init){
+      gauge.dataset.init=1;
+      gauge.innerHTML=`<div class="ttl">שיפוע רצפת המקלחון</div>
+        <div id="track"><div id="band"><span>תקין</span></div>
+          ${[0,1,2,3,4].map(v=>`<div class="tick" style="left:${v*25}%">${v}%</div>`).join('')}
+          <div class="mk" id="m1" style="left:${0.2*25}%"><div class="v" style="transform:translateX(-30px)">0.2%</div><div class="st" style="height:130px"></div></div>
+          <div class="mk" id="m2" style="left:${0.6*25}%"><div class="v" style="transform:translateX(40px)">0.6%</div><div class="st" style="height:50px"></div></div>
+        </div>
+        <div class="foot">שתי המדידות <b>מתחת למינימום הנדרש</b></div>`;
+    }
+    const gp=easeOut(prog(lt,2.6,0.5));
+    gauge.style.opacity=gp; gauge.style.transform=`translateY(${(1-gp)*60}px)`;
+    const bp=easeOut(prog(lt,3.0,0.8));
+    const band=$('band'); band.style.left='25%'; band.style.width=(75*bp)+'%';
+    band.querySelector('span').style.opacity=clamp((bp-0.6)*3);
+    [['m1',7.25],['m2',7.55]].forEach(([id,st])=>{
+      const p=prog(lt,st,0.4), el=$(id);
+      el.style.opacity=clamp(p*2); el.style.transform=`translateX(-50%) translateY(${(1-easeBack(p))*-50}px)`;
+    });
+    gauge.querySelector('.foot').style.opacity=easeOut(prog(lt,7.9,0.4));
+    return {svg:'',pills:''};
+ }},
+ { d:10.83, draw(lt){
+    bg.src='seq/b24bd2ab.jpg';
+    camera(1.05+0.05*lt/5.4,540,1000);
+    dim.style.background='rgba(9,28,52,.80)';
+    setCaption(lt,'מים עומדים לאורך זמן עלולים לגרום ל-','<em>הנזק -</em>',210); cap.classList.add('rev');
+    chain.style.display='block';
+    const items=['עובש והתרבות יתושים','התפוררות הרובה במישקים','חדירת מים לשכבות שמתחת לריצוף','פגיעה במערכת האיטום ונזילה לדירה שמתחת'];
+    if(!chain.dataset.init){
+      chain.dataset.init=1;
+      chain.innerHTML=`<div id="rail"></div>`+items.map((s,i)=>`<div class="step ${i==3?'last':''}"><div class="n">${i+1}</div><div class="t">${s}</div></div>`).join('');
+    }
+    const steps=[...chain.querySelectorAll('.step')];
+    steps.forEach((el,i)=>{
+      const p=easeOut(prog(lt,[0.45,3.7,5.1,7.1][i],0.4));
+      el.style.opacity=p; el.style.transform=`translateX(${(1-p)*-60}px)`;
+    });
+    const rail=$('rail'); rail.style.height=(3*(92+44))+'px';
+    rail.style.transform=`scaleY(${clamp((lt-0.45)/6.65)})`;
+    return {svg:'',pills:''};
+ }},
+ { d:4.69, draw(lt){
+    bg.src=`seq/c/${pad(Math.min(125,1+Math.floor(lt*FPS)))}.jpg`;
+    camera(1,540,960);
+    setCaption(lt,'ליקוי שמתגלה בבדק בית','<em>לפני המסירה.</em>|לא אחרי.');
+    return {svg:'',pills:''};
+ }},
+ { d:5.0, draw(lt){
+    end.style.display='block'; tag.style.display='none'; cap.style.display='none'; shade.style.display='none';
+    if(!end.dataset.init){
+      end.dataset.init=1;
+      end.innerHTML=`<div class="stripe"></div>
+        <div class="share"><div class="s1 a">מקבלים דירה?</div><div class="s2 a">שלחו את זה|<em>למי שצריך</em></div></div>
+        <div class="brand a"><img src="seq/logo.png"></div>
+        <div class="contact a"><div class="ph">054-7736910</div><div class="web">masrati.co.il</div></div>`;
+      end.querySelector('.s2').innerHTML=end.querySelector('.s2').innerHTML.replace('|','<br>');
+    }
+    [...end.querySelectorAll('.a')].forEach((el,i)=>{
+      const p=easeOut(prog(lt,[0.15,1.37,3.0,3.35][i],0.5));
+      el.style.opacity=p; el.style.transform=`translateY(${(1-p)*40}px)`;
+    });
+    end.querySelector('.stripe').style.transform=`skewX(-14deg) translateX(${(1-easeOut(prog(lt,0,0.8)))*-700}px)`;
+    return {svg:'',pills:''};
+ }},
+];
+const TOTAL = S.reduce((a,s)=>a+s.d,0);
+
+window.render = function(t){
+  let acc=0, i=0;
+  while(i<S.length-1 && t>=acc+S[i].d){acc+=S[i].d;i++;}
+  const lt=t-acc;
+  // reset per-scene layers
+  dim.style.background='rgba(9,28,52,0)';
+  gauge.style.display='none'; chain.style.display='none'; end.style.display='none'; mop.style.display='none'; std.style.display='none';
+  tag.style.display='flex'; shade.style.display='block'; cap.classList.remove('rev');
+  if(window._scene!==i){ window._scene=i; gauge.dataset.init=''; chain.dataset.init=''; end.dataset.init=''; cap.dataset.key=''; }
+  const r=S[i].draw(lt);
+  ann.innerHTML=r.svg; pills.innerHTML=r.pills;
+  return new Promise(res=>{ if(bg.complete) res(); else bg.onload=()=>res(); });
+};
+window.TOTAL=TOTAL;
+</script>
+</body>
+</html>
